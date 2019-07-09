@@ -51,6 +51,18 @@
 # kubetcl must be first in the list - kubeadm has dependency to kubectl without version
 - name: Install k8s packages if defined
   package:
+    name: "{{ item }}=0.6.0-00"
+    state: present
+  with_items:
+    - kubernetes-cni
+  when: k8s_package_version is defined
+  register: res
+  retries: 5
+  until: res | success
+
+# kubetcl must be first in the list - kubeadm has dependency to kubectl without version
+- name: Install k8s packages if defined
+  package:
     name: "{{ item }}{{ k8s_package_version }}"
     state: present
   with_items:
