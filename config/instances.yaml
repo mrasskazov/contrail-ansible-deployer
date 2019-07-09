@@ -1,10 +1,41 @@
 provider_config:
   bms:
+    ssh_user: root
+    ssh_public_key: /root/.ssh/id_rsa.pub
+    ssh_private_key: /root/.ssh/id_rsa
+    domainsuffix: openstacklocal
+    ntpserver: pool.ntp.org
+    #ntpserver: 0.centos.pool.ntp.org
+
 instances:
-  bms1:
+  mrasskazov-k8s-master-01:
+    # k8s master
     provider: bms
-    ip: 192.168.1.100
+    ip: 192.168.0.13
+    roles:
+      config_database:
+      config:
+      control:
+      analytics:
+      analytics_database:
+      webui:
+      k8s_master:
+      kubemanager:
+  mrasskazov-k8s-node-01:
+    # k8s node
+    provider: bms
+    roles:
+      vrouter:
+      k8s_node:
+    ip: 192.168.0.30
+
 global_configuration:
-  CONTAINER_REGISTRY: michaelhenkel
+  CONTAINER_REGISTRY: docker-dev-local.docker.mirantis.net/opencontrail-exp-5.1-upstream
+  REGISTRY_PRIVATE_INSECURE: True
+
 contrail_configuration:
-  CONTRAIL_VERSION: queens-5.0-20180219195722
+  #CONTRAIL_VERSION: 5.1-4.15.0-54-generic
+  CONTRAIL_CONTAINER_TAG: 5.1-4.15.0-54-generic
+  KUBERNETES_CLUSTER_PROJECT: {}
+  JVM_EXTRA_OPTS: "-Xms128m -Xmx1g"
+  UPGRADE_KERNEL: false
