@@ -10,6 +10,8 @@
     k8s_master_ip_list: "{{ k8s_master_ip_list + [ hostvars[item]['private_ip'] ] }}"
     k8s_master_name_list: "{{ k8s_master_name_list + [ item ] }}"
   when:
+    - hostvars[item].instance_name is defined
+    - roles[hostvars[item]['instance_name']] is defined
     - roles[hostvars[item]['instance_name']].k8s_master is defined
   with_items:
     - "{{ groups['container_hosts'] }}"
