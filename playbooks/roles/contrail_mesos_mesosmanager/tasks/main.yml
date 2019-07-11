@@ -35,8 +35,8 @@
 
 - name: "populate pod specific common_mesosmanager.env"
   lineinfile: dest=/etc/contrail/common_mesosmanager.env regexp='^{{ item.key }}=.*' line="{{ item.key }}={{ item.value }}" state=present
-  with_dict: "{{ roles[instance_name].mesosmanager }} | default ({})"
-  when: roles[instance_name].mesosmanager is defined
+  with_dict: "{{ instances[instance_name].roles.mesosmanager }} | default ({})"
+  when: instances[instance_name].roles.mesosmanager is defined
   ignore_errors: yes
   no_log: True
 

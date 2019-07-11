@@ -28,7 +28,7 @@
 
 - name: "populate pod specific common_vcmanager.env"
   lineinfile: dest=/etc/contrail/common_vcmanager.env regexp='.*{{ item.key }}$' line="{{ item.key }}={{ item.value }}" state=present
-  with_dict: "{{ roles[instance_name].vcenter_manager }}"
+  with_dict: "{{ instances[instance_name].roles.vcenter_manager }}"
   ignore_errors: yes
   no_log: True
 

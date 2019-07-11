@@ -23,13 +23,13 @@
 
 - name: set location if defined
   set_fact:
-    location: "{{ roles[instance_name].control.location }}"
-  when: roles[instance_name].control.location is defined
+    location: "{{ instances[instance_name].roles.control.location }}"
+  when: instances[instance_name].roles.control.location is defined
 
 - name: init location control peers list if location is defined
   set_fact:
     control_peer_list: []
-  when: roles[instance_name].control.location is defined
+  when: instances[instance_name].roles.control.location is defined
 
 - name: add peer control nodes to the list
   set_fact:
@@ -46,7 +46,7 @@
 - name: create contrail_configuration.CONTROL_NODES
   set_fact:
     contrail_configuration: "{{ contrail_configuration|default({})|combine({'CONTROL_NODES': control_peers}) }}"
-  when: control_peers is defined and roles[instance_name].control.CONTROL_NODES is undefined
+  when: control_peers is defined and instances[instance_name].roles.control.CONTROL_NODES is undefined
 
 - name: "populate global common_control.env"
   lineinfile: dest=/etc/contrail/common_control.env regexp='^{{ item.key }}=.*' line="{{ item.key }}={{ item.value }}" state=present
@@ -62,7 +62,7 @@
 
 - name: "populate pod specific common_control.env"
   lineinfile: dest=/etc/contrail/common_control.env regexp='^{{ item.key }}=.*' line="{{ item.key }}={{ item.value }}" state=present
-  with_dict: "{{ roles[instance_name].control }}"
+  with_dict: "{{ instances[instance_name].roles.control }}"
   ignore_errors: yes
   no_log: True
 

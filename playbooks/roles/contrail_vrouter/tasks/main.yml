@@ -7,8 +7,8 @@
 
 - name: "get pop"
   set_fact:
-    location: "{{ roles[instance_name].vrouter.location }}"
-  when: roles[instance_name].vrouter.location is defined
+    location: "{{ instances[instance_name].roles.vrouter.location }}"
+  when: instances[instance_name].roles.vrouter.location is defined
 
 - name: "init pop control peer list"
   set_fact:
@@ -30,12 +30,12 @@
 - name: "create contrail_configuration.CONTROL_NODES"
   set_fact:
     contrail_configuration: "{{ contrail_configuration|default({})|combine({'CONTROL_NODES': pop_control_nodes}) }}"
-  when: pop_control_nodes is defined and roles[instance_name].vrouter.CONTROL_NODES is undefined
+  when: pop_control_nodes is defined and instances[instance_name].roles.vrouter.CONTROL_NODES is undefined
 
 - name: "set DNS servers if location is defined"
   set_fact:
     contrail_configuration: "{{ contrail_configuration|default({})|combine({'DNS_NODES': contrail_configuration.DNS_NODES|default(contrail_configuration.CONTROLLER_NODES)}) }}"
-  when: pop_control_nodes is defined and roles[instance_name].vrouter.DNS_NODES is undefined
+  when: pop_control_nodes is defined and instances[instance_name].roles.vrouter.DNS_NODES is undefined
 
 - name: populate common_vrouter.env
   template:
@@ -78,18 +78,18 @@
     - contrail-vrouter-agent
   when:
     - contrail_configuration.UPDATE_IMAGES is undefined or contrail_configuration.UPDATE_IMAGES != false
-    - roles[instance_name].vrouter.AGENT_MODE is undefined or roles[instance_name].vrouter.AGENT_MODE != 'dpdk'
+    - instances[instance_name].roles.vrouter.AGENT_MODE is undefined or instances[instance_name].roles.vrouter.AGENT_MODE != 'dpdk'
 
 - name: create contrail vrouter compose file
   template:
     src: contrail-vrouter.yaml.j2
     dest: "/etc/contrail/vrouter/docker-compose.yaml"
-  when: roles[instance_name].vrouter.AGENT_MODE is undefined or roles[instance_name].vrouter.AGENT_MODE != 'dpdk'
+  when: instances[instance_name].roles.vrouter.AGENT_MODE is undefined or instances[instance_name].roles.vrouter.AGENT_MODE != 'dpdk'
 
 - name: "start contrail vrouter"
   docker_service:
     project_src: /etc/contrail/vrouter
-  when: roles[instance_name].vrouter.AGENT_MODE is undefined or roles[instance_name].vrouter.AGENT_MODE != 'dpdk'
+  when: instances[instance_name].roles.vrouter.AGENT_MODE is undefined or instances[instance_name].roles.vrouter.AGENT_MODE != 'dpdk'
 
 - name: update image for dpdk vrouter
   shell: "docker pull {{ container_registry }}/{{ item }}:{{ contrail_version_tag }}"
@@ -101,29 +101,29 @@
     - contrail-vrouter-agent
   when:
     - contrail_configuration.UPDATE_IMAGES is undefined or contrail_configuration.UPDATE_IMAGES != false
-    - roles[instance_name].vrouter.AGENT_MODE is defined
-    - roles[instance_name].vrouter.AGENT_MODE == 'dpdk'
+    - instances[instance_name].roles.vrouter.AGENT_MODE is defined
+    - instances[instance_name].roles.vrouter.AGENT_MODE == 'dpdk'
 
 - name: "Set variables for DPDK plugins"
   set_fact:
     plugin_os: "{{ 'ubuntu' if (ansible_os_family == 'Debian') else 'redhat' }}"
-    mellanox: "{{ true if (roles[instance_name].vrouter.DPDK_UIO_DRIVER is defined
-                  and roles[instance_name].vrouter.DPDK_UIO_DRIVER == 'mlnx') else false }}"
+    mellanox: "{{ true if (instances[instance_name].roles.vrouter.DPDK_UIO_DRIVER is defined
+                  and instances[instance_name].roles.vrouter.DPDK_UIO_DRIVER == 'mlnx') else false }}"
 
 - name: "create contrail dpdk vrouter compose file"
   template:
     src: contrail-vrouter-dpdk.yaml.j2
     dest: "/etc/contrail/vrouter/docker-compose.yaml"
-  when: roles[instance_name].vrouter.AGENT_MODE is defined and roles[instance_name].vrouter.AGENT_MODE == 'dpdk'
+  when: instances[instance_name].roles.vrouter.AGENT_MODE is defined and instances[instance_name].roles.vrouter.AGENT_MODE == 'dpdk'
 
 - name: "start contrail dpdk vrouter"
   docker_service:
     project_src: /etc/contrail/vrouter
-  when: roles[instance_name].vrouter.AGENT_MODE is defined and roles[instance_name].vrouter.AGENT_MODE == 'dpdk'
+  when: instances[instance_name].roles.vrouter.AGENT_MODE is defined and instances[instance_name].roles.vrouter.AGENT_MODE == 'dpdk'
 
 - name: "Restart nova-compute"
   shell: "docker restart nova_compute"
-  when: roles[instance_name].vrouter.AGENT_MODE is defined and roles[instance_name].vrouter.AGENT_MODE == 'dpdk'
+  when: instances[instance_name].roles.vrouter.AGENT_MODE is defined and instances[instance_name].roles.vrouter.AGENT_MODE == 'dpdk'
   ignore_errors: yes
 
 - name: "create /var/log/contrail/lbaas"

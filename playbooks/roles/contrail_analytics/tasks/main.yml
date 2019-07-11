@@ -35,7 +35,7 @@
 
 - name: "populate pod specific common_analytics.env"
   lineinfile: dest=/etc/contrail/common_analytics.env regexp='^{{ item.key }}=.*' line="{{ item.key }}={{ item.value }}" state=present
-  with_dict: "{{ roles[instance_name].analytics }}"
+  with_dict: "{{ instances[instance_name].roles.analytics }}"
   ignore_errors: yes
   no_log: True
 

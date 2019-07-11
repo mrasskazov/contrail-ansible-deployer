@@ -36,7 +36,7 @@
 - name: "populate pod specific tsn_haproxy.env"
   lineinfile: dest=/etc/contrail/tsn_haproxy.env regexp='^{{ item.key }}=.*' line="{{ item.key }}={{ item.value | string }}" state=present
   with_dict:
-    "{{ roles[instance_name].tsn_haproxy }}"
+    "{{ instances[instance_name].roles.tsn_haproxy }}"
 
 - name: "update image"
   shell: "docker pull {{ container_registry }}/{{ item }}:{{ contrail_version_tag }}"

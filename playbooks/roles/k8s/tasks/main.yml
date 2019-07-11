@@ -76,15 +76,15 @@
 
 - name: configure k8s master
   include: configure_k8s_master_node.yml
-  when: roles[instance_name].k8s_master is defined and k8s_master_name is defined and inventory_hostname == k8s_master_name
+  when: instances[instance_name].roles.k8s_master is defined and k8s_master_name is defined and inventory_hostname == k8s_master_name
 
 - name: join k8s master
   include: configure_k8s_join_node.yml
-  when: roles[instance_name].k8s_node is defined and k8s_master_name is defined and inventory_hostname != k8s_master_name
+  when: instances[instance_name].roles.k8s_node is defined and k8s_master_name is defined and inventory_hostname != k8s_master_name
 
 - name: create k8s dashboard
   include: create_k8s_dashboard.yml
-  when: roles[instance_name].k8s_master is defined and k8s_master_name is defined and inventory_hostname == k8s_master_name
+  when: instances[instance_name].roles.k8s_master is defined and k8s_master_name is defined and inventory_hostname == k8s_master_name
 
 - name: untaint node
   shell: "kubectl taint nodes {{ hostvars[instance.value.ip]['ansible_fqdn'] }} node-role.kubernetes.io/master-"
@@ -92,7 +92,7 @@
   loop_control:
     loop_var: instance
   when:
-    - roles[instance_name].k8s_master is defined
+    - instances[instance_name].roles.k8s_master is defined
     - k8s_master_name is defined
     - inventory_hostname == k8s_master_name
     - instance.value.roles is defined
