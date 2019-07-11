@@ -8,7 +8,8 @@ provider_config:
     #ntpserver: 0.centos.pool.ntp.org
 
 instances:
-  mrasskazov-k8s-master-01:
+  192.168.0.13:
+  #mrasskazov-k8s-master-01:
     # k8s master
     provider: bms
     ip: 192.168.0.13
@@ -21,13 +22,14 @@ instances:
       webui:
       k8s_master:
       kubemanager:
-  mrasskazov-k8s-node-01:
+  192.168.0.30:
+  #mrasskazov-k8s-node-01:
     # k8s node
     provider: bms
+    ip: 192.168.0.30
     roles:
       vrouter:
       k8s_node:
-    ip: 192.168.0.30
 
 global_configuration:
   CONTAINER_REGISTRY: docker-dev-local.docker.mirantis.net/opencontrail-exp-5.1-upstream
