@@ -8,11 +8,10 @@ provider_config:
     #ntpserver: 0.centos.pool.ntp.org
 
 instances:
-  #192.168.0.8:
-  mrasskazov-bionic-k8s-master-01:
-    # k8s master
+  mrasskazov-bionic-os-master-01:
     provider: bms
-    ip: 192.168.0.8
+    # here is MGMT IP
+    ip: 192.168.3.9
     roles:
       config_database:
       config:
@@ -20,16 +19,14 @@ instances:
       analytics:
       analytics_database:
       webui:
-      k8s_master:
-      kubemanager:
-  #192.168.0.11:
-  mrasskazov-bionic-k8s-node-01:
-    # k8s node
+      openstack:
+  mrasskazov-bionic-os-compute-01:
     provider: bms
-    ip: 192.168.0.11
+    # here is MGMT IP
+    ip: 192.168.3.2
     roles:
       vrouter:
-      k8s_node:
+      openstack-compute:
 
 global_configuration:
   CONTAINER_REGISTRY: docker-dev-local.docker.mirantis.net/opencontrail-exp-5.1-upstream
@@ -38,6 +35,26 @@ global_configuration:
 contrail_configuration:
   #CONTRAIL_VERSION: 5.1-4.15.0-54-generic
   CONTRAIL_CONTAINER_TAG: 5.1-4.15.0-54-generic
-  KUBERNETES_CLUSTER_PROJECT: {}
   JVM_EXTRA_OPTS: "-Xms128m -Xmx1g"
+  # Set UPGRADE_KERNEL to True to automatically install the latest kernel version
   UPGRADE_KERNEL: false
+
+  # here is API IP
+  CONTROLLER_NODES: 192.168.2.7
+  # here is CTRL/DATA IP
+  CONTROL_NODES: 192.168.1.10
+
+
+  CLOUD_ORCHESTRATOR: openstack
+  # Default value for OPENSTACK_VERSION is 'queens'
+  OPENSTACK_VERSION: queens
+  VROUTER_GATEWAY: 192.168.1.1
+  AUTH_MODE: keystone
+  KEYSTONE_AUTH_URL_VERSION: /v3
+kolla_config:
+  kolla_globals:
+    enable_haproxy: no
+    enable_ironic: no
+    enable_swift: no
+  kolla_passwords:
+    keystone_admin_password: hujpizdajigurda
